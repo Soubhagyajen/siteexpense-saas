@@ -21,7 +21,7 @@ def dashboard(request):
     recent = Expense.objects.select_related('project', 'spent_by').order_by('-created_at')[:8]
     return render(request, 'expenses/dashboard.html', {
         'advance_total': advances, 'approved_total': approved,
-        'pending_total': pending, 'recent_expenses': recent,
+        'pending_total': pending, 'balance': advances - approved, 'recent_expenses': recent,
         'role': _role(request.user),
     })
 @login_required
