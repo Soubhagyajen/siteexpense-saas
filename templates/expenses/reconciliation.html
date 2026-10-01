@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Reconciliation · SiteExpense{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-2">Monthly Reconciliation</h1>
-<p class="text-slate-500 mb-6">Current MVP calculation across all sites.</p>
-<div class="grid md:grid-cols-3 gap-4">
-  <div class="bg-white rounded-2xl p-6 shadow-sm"><p class="text-slate-500">Advance Received</p><p class="text-3xl font-bold mt-2">₹{{ advances|floatformat:2 }}</p></div>
-  <div class="bg-white rounded-2xl p-6 shadow-sm"><p class="text-slate-500">Approved Expenses</p><p class="text-3xl font-bold mt-2">₹{{ expenses|floatformat:2 }}</p></div>
-  <div class="bg-slate-950 text-white rounded-2xl p-6 shadow-sm"><p class="text-slate-300">Balance Remaining</p><p class="text-3xl font-bold mt-2">₹{{ balance|floatformat:2 }}</p></div>
+<div class="mb-7"><div class="text-xs font-bold tracking-widest text-brand-500">MONTH END</div><h1 class="text-3xl font-black mt-1">Reconciliation</h1><p class="text-slate-500 mt-1">See what was received, what was spent and what remains for a site.</p></div>
+<form method="get" class="bg-white rounded-2xl shadow-soft p-4 mb-6 flex flex-col sm:flex-row gap-3 sm:items-end">
+  <div class="flex-1"><label class="text-xs font-semibold text-slate-500">Project / Site</label><select name="project" class="mt-1">{% for p in projects %}<option value="{{ p.pk }}" {% if project.pk == p.pk %}selected{% endif %}>{{ p.code }} — {{ p.name }}</option>{% endfor %}</select></div>
+  <div><label class="text-xs font-semibold text-slate-500">Month</label><input type="month" name="month" value="{{ month_value }}" class="mt-1"></div>
+  <button class="rounded-xl bg-brand-950 text-white px-5 py-2.5 text-sm font-semibold">Refresh</button>
+</form>
+<div class="mb-4 text-sm text-slate-500">{% if project %}Showing <span class="font-semibold text-slate-900">{{ project.code }} — {{ project.name }}</span> for {{ month_value }}.{% else %}Create a project first to start reconciliation.{% endif %}</div>
+<div class="grid md:grid-cols-4 gap-4">
+  <div class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-slate-500 text-sm">Opening balance</p><p class="text-2xl font-black mt-3">₹{{ opening_balance|floatformat:2 }}</p></div>
+  <div class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-slate-500 text-sm">Advance this month</p><p class="text-2xl font-black mt-3">₹{{ total_advance|floatformat:2 }}</p></div>
+  <div class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-slate-500 text-sm">Approved expenses</p><p class="text-2xl font-black mt-3">₹{{ total_expense|floatformat:2 }}</p></div>
+  <div class="bg-brand-950 text-white rounded-2xl p-5 shadow-soft"><p class="text-white/60 text-sm">Closing balance</p><p class="text-2xl font-black mt-3">₹{{ closing_balance|floatformat:2 }}</p></div>
 </div>
-<div class="mt-8 bg-white rounded-2xl p-6"><h2 class="font-semibold">Core rule</h2><p class="text-slate-600 mt-2">Advance Received − Approved Expenses = Remaining Advance.</p></div>
+<div class="mt-6 bg-white rounded-2xl shadow-soft p-6">
+  <div class="flex items-center justify-between gap-4"><div><h2 class="font-bold text-lg">Reconciliation formula</h2><p class="text-slate-500 text-sm mt-1">Opening balance + current advances − approved expenses.</p></div><span class="rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-bold">Calculated</span></div>
+  <div class="mt-5 rounded-xl bg-slate-50 p-4 font-mono text-sm">₹{{ opening_balance|floatformat:2 }} + ₹{{ total_advance|floatformat:2 }} − ₹{{ total_expense|floatformat:2 }} = <span class="font-black">₹{{ closing_balance|floatformat:2 }}</span></div>
+</div>
 {% endblock %}

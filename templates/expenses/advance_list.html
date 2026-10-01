@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Advances · SiteExpense{% endblock %}
 {% block content %}
-<div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold">Advances</h1><a href="{% url 'advance_create' %}" class="rounded-lg bg-slate-950 text-white px-4 py-2">+ Record Advance</a></div>
-<div class="bg-white rounded-2xl shadow-sm overflow-hidden"><table class="w-full text-left">
-<tr class="border-b"><th class="p-4">Date</th><th>Project</th><th>Recipient</th><th>Reference</th><th>Amount</th></tr>
-{% for a in advances %}<tr class="border-b"><td class="p-4">{{ a.date }}</td><td>{{ a.project.code }}</td><td>{{ a.recipient.username }}</td><td>{{ a.reference|default:"—" }}</td><td>₹{{ a.amount }}</td></tr>
-{% empty %}<tr><td colspan="5" class="p-8 text-center text-slate-400">No advances recorded.</td></tr>{% endfor %}
-</table></div>
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
+  <div><div class="text-xs font-bold tracking-widest text-brand-500">FUNDS</div><h1 class="text-3xl font-black mt-1">Advances</h1><p class="text-slate-500 mt-1">Track money released to managers and site teams.</p></div>
+  <a href="{% url 'advance_create' %}" class="rounded-xl bg-brand-950 text-white px-4 py-2.5 text-sm font-semibold">＋ Record Advance</a>
+</div>
+<div class="bg-white rounded-2xl shadow-soft overflow-hidden">
+<table class="w-full min-w-[800px] text-left"><thead class="bg-slate-50 text-xs uppercase text-slate-400"><tr><th class="p-4">Date</th><th>Project</th><th>Recipient</th><th>Reference</th><th class="text-right pr-5">Amount</th></tr></thead><tbody>
+{% for a in advances %}<tr class="border-b last:border-0 hover:bg-slate-50/60"><td class="p-4 text-sm">{{ a.date|date:"d M Y" }}</td><td class="font-semibold">{{ a.project.code }}</td><td>{{ a.recipient.get_full_name|default:a.recipient.username }}</td><td class="text-sm">{{ a.reference|default:"—" }}</td><td class="text-right pr-5 font-black">₹{{ a.amount|floatformat:2 }}</td></tr>
+{% empty %}<tr><td colspan="5" class="p-12 text-center text-slate-400">No advances recorded yet.</td></tr>{% endfor %}
+</tbody></table></div>
 {% endblock %}

@@ -2,30 +2,40 @@
 {% block title %}Dashboard · SiteExpense{% endblock %}
 {% block content %}
 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-8">
-  <div><div class="text-sm font-semibold text-brand-500">OVERVIEW</div><h1 class="text-3xl sm:text-4xl font-black tracking-tight mt-1">Good day, {{ user.first_name|default:user.username }} 👋</h1><p class="text-slate-500 mt-2">Here's what is happening across your site expenses.</p></div>
-  <div class="flex gap-2"><a href="{% url 'advance_create' %}" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">＋ Advance</a><a href="{% url 'expense_create' %}" class="rounded-xl bg-brand-950 text-white px-4 py-2.5 text-sm font-semibold">＋ Expense</a></div>
+  <div><div class="text-sm font-semibold text-brand-500">SITE FINANCE</div><h1 class="text-3xl sm:text-4xl font-black tracking-tight mt-1">Good day, {{ user.first_name|default:user.username }} 👋</h1><p class="text-slate-500 mt-2">Track advances, actual site spend, approvals and the accounting trail.</p></div>
+  <div class="flex gap-2"><a href="{% url 'advance_create' %}" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold">＋ Advance</a><a href="{% url 'expense_create' %}" class="rounded-xl bg-brand-950 text-white px-4 py-2.5 text-sm font-semibold">＋ Expense</a></div>
 </div>
 <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
   <div class="bg-white rounded-2xl p-5 shadow-soft lift"><div class="flex justify-between"><span class="text-slate-500 text-sm">Advance received</span><span class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">₹</span></div><div class="text-2xl font-black mt-4">₹{{ advance_total|floatformat:0 }}</div><div class="text-xs text-slate-400 mt-1">Total funds released</div></div>
   <div class="bg-white rounded-2xl p-5 shadow-soft lift"><div class="flex justify-between"><span class="text-slate-500 text-sm">Approved spend</span><span class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">↗</span></div><div class="text-2xl font-black mt-4">₹{{ approved_total|floatformat:0 }}</div><div class="text-xs text-slate-400 mt-1">Verified expenses</div></div>
-  <div class="bg-white rounded-2xl p-5 shadow-soft lift"><div class="flex justify-between"><span class="text-slate-500 text-sm">Pending review</span><span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">!</span></div><div class="text-2xl font-black mt-4">₹{{ pending_total|floatformat:0 }}</div><div class="text-xs text-slate-400 mt-1">Waiting for approval</div></div>
-  <div class="bg-gradient-to-br from-brand-950 to-brand-900 text-white rounded-2xl p-5 shadow-soft"><div class="text-white/60 text-sm">Available balance</div><div class="text-2xl font-black mt-4">₹{{ balance|floatformat:0 }}</div><div class="text-xs text-white/50 mt-1">Advance minus approved spend</div></div>
+  <div class="bg-white rounded-2xl p-5 shadow-soft lift"><div class="flex justify-between"><span class="text-slate-500 text-sm">Pending review</span><span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">!</span></div><div class="text-2xl font-black mt-4">₹{{ pending_total|floatformat:0 }}</div><div class="text-xs text-slate-400 mt-1">Waiting for founder approval</div></div>
+  <div class="bg-brand-950 text-white rounded-2xl p-5 shadow-soft"><div class="text-white/60 text-sm">Available balance</div><div class="text-2xl font-black mt-4">₹{{ balance|floatformat:0 }}</div><div class="text-xs text-white/50 mt-1">Advance minus approved spend</div></div>
 </div>
 <div class="grid xl:grid-cols-3 gap-6">
   <div class="xl:col-span-2 bg-white rounded-2xl shadow-soft overflow-hidden">
-    <div class="p-5 border-b flex items-center justify-between"><div><h2 class="font-bold text-lg">Recent expenses</h2><p class="text-sm text-slate-400">Latest site transactions</p></div><a href="{% url 'expense_list' %}" class="text-sm font-semibold text-brand-500">View all →</a></div>
-    <div class="overflow-x-auto"><table class="w-full text-left min-w-[700px]"><thead class="bg-slate-50 text-xs uppercase text-slate-400"><tr><th class="px-5 py-3">Date</th><th>Project</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>
-    {% for e in recent_expenses %}<tr class="border-b last:border-0 hover:bg-slate-50/70"><td class="px-5 py-4 text-sm">{{ e.date|date:"d M Y" }}</td><td class="font-semibold text-sm">{{ e.project.code }}</td><td class="text-sm">{{ e.description }}</td><td class="font-bold">₹{{ e.amount|floatformat:0 }}</td><td><span class="px-2.5 py-1 rounded-full text-xs font-semibold {% if e.status == 'APPROVED' %}bg-emerald-50 text-emerald-700{% elif e.status == 'SUBMITTED' %}bg-amber-50 text-amber-700{% else %}bg-slate-100 text-slate-600{% endif %}">{{ e.get_status_display }}</span></td></tr>
-    {% empty %}<tr><td colspan="5" class="px-5 py-12 text-center text-slate-400">No expenses yet. Start by recording one.</td></tr>{% endfor %}
-    </tbody></table></div>
-  </div>
-  <div class="bg-brand-950 text-white rounded-2xl p-6 shadow-soft">
-    <div class="text-white/50 text-xs font-bold tracking-widest">WORKFLOW</div><h2 class="text-xl font-bold mt-2">From advance to Tally</h2><div class="mt-6 space-y-4">
-      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">1</span><div><div class="font-semibold">Advance created</div><div class="text-xs text-white/50">Founder releases site funds</div></div></div>
-      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">2</span><div><div class="font-semibold">Expense recorded</div><div class="text-xs text-white/50">Team captures actual spend</div></div></div>
-      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">3</span><div><div class="font-semibold">Approval</div><div class="text-xs text-white/50">Founder verifies the claim</div></div></div>
-      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">4</span><div><div class="font-semibold">Reconciliation</div><div class="text-xs text-white/50">Balance ready for accounting</div></div></div>
+    <div class="p-5 border-b flex items-center justify-between"><div><h2 class="font-bold text-lg">Pending approvals</h2><p class="text-sm text-slate-400">Claims waiting for the founder</p></div><a href="{% url 'expense_list' %}" class="text-sm font-semibold text-brand-500">View all →</a></div>
+    <div class="divide-y">
+      {% for e in pending_reviews %}
+      <a href="{% url 'expense_detail' e.pk %}" class="p-5 flex items-center justify-between gap-4 hover:bg-slate-50/70 block">
+        <div class="min-w-0"><div class="font-semibold truncate">{{ e.description }}</div><div class="text-xs text-slate-400 mt-1">{{ e.project.code }} · {{ e.spent_by.get_full_name|default:e.spent_by.username }} · {{ e.date|date:"d M Y" }}</div></div>
+        <div class="text-right shrink-0"><div class="font-black">₹{{ e.amount|floatformat:2 }}</div><div class="text-xs text-amber-600 mt-1">Review →</div></div>
+      </a>
+      {% empty %}<div class="p-12 text-center text-slate-400">No pending approvals. Your queue is clear.</div>{% endfor %}
     </div>
   </div>
+  <div class="bg-brand-950 text-white rounded-2xl p-6 shadow-soft">
+    <div class="text-white/50 text-xs font-bold tracking-widest">WORKFLOW</div><h2 class="text-xl font-bold mt-2">Advance → Tally</h2><div class="mt-6 space-y-4">
+      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">1</span><div><div class="font-semibold">Advance</div><div class="text-xs text-white/50">Founder releases site funds</div></div></div>
+      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">2</span><div><div class="font-semibold">Expense + receipt</div><div class="text-xs text-white/50">Team records actual spend</div></div></div>
+      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">3</span><div><div class="font-semibold">Debit voucher</div><div class="text-xs text-white/50">Digital voucher is generated</div></div></div>
+      <div class="flex gap-3"><span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">4</span><div><div class="font-semibold">Approval + ledger</div><div class="text-xs text-white/50">Approved claim posts to accounting</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="mt-6 bg-white rounded-2xl shadow-soft overflow-hidden">
+  <div class="p-5 border-b flex items-center justify-between"><div><h2 class="font-bold text-lg">Recent expenses</h2><p class="text-sm text-slate-400">Latest site transactions</p></div><a href="{% url 'expense_list' %}" class="text-sm font-semibold text-brand-500">View all →</a></div>
+  <div class="overflow-x-auto"><table class="w-full min-w-[700px] text-left"><thead class="bg-slate-50 text-xs uppercase text-slate-400"><tr><th class="px-5 py-3">Date</th><th>Project</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+  {% for e in recent_expenses %}<tr class="border-b last:border-0 hover:bg-slate-50/60"><td class="px-5 py-4 text-sm">{{ e.date|date:"d M Y" }}</td><td class="font-semibold text-sm">{{ e.project.code }}</td><td class="text-sm">{{ e.description }}</td><td class="font-bold">₹{{ e.amount|floatformat:0 }}</td><td><span class="px-2.5 py-1 rounded-full text-xs font-semibold">{{ e.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="5" class="px-5 py-12 text-center text-slate-400">No expenses yet.</td></tr>{% endfor %}
+  </tbody></table></div>
 </div>
 {% endblock %}

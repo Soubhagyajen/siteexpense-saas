@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Expense #{{ expense.pk }} · SiteExpense{% endblock %}
+{% block content %}
+<div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 mb-7">
+  <div>
+    <div class="text-xs font-bold tracking-widest text-brand-500 uppercase">Expense #{{ expense.pk }}</div>
+    <h1 class="text-3xl font-black tracking-tight mt-1">{{ expense.description }}</h1>
+    <p class="text-slate-500 mt-1">{{ expense.project.code }} · {{ expense.date|date:"d M Y" }}</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{% url 'voucher_detail' expense.voucher.pk %}" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">View Debit Voucher</a>
+    {% if role == 'FOUNDER' and expense.status == 'SUBMITTED' %}
+      <form method="post" action="{% url 'approve_expense' expense.pk %}">{% csrf_token %}<button class="rounded-xl bg-emerald-600 text-white px-4 py-2.5 text-sm font-semibold">Approve & Post</button></form>
+      <form method="post" action="{% url 'reject_expense' expense.pk %}">{% csrf_token %}<button class="rounded-xl bg-rose-600 text-white px-4 py-2.5 text-sm font-semibold">Reject</button></form>
+    {% endif %}
+  </div>
+</div>
+<div class="grid xl:grid-cols-3 gap-6">
+  <div class="xl:col-span-2 space-y-6">
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-bold text-lg">Expense details</h2>
+        <span class="rounded-full px-3 py-1 text-xs font-bold {% if expense.status == 'APPROVED' %}bg-emerald-50 text-emerald-700{% elif expense.status == 'SUBMITTED' %}bg-amber-50 text-amber-700{% elif expense.status == 'REJECTED' %}bg-rose-50 text-rose-700{% else %}bg-slate-100 text-slate-600{% endif %}">{{ expense.get_status_display }}</span>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-x-8 gap-y-5">
+        <div><div class="text-xs text-slate-400">Amount</div><div class="text-2xl font-black mt-1">₹{{ expense.amount|floatformat:2 }}</div></div>
+        <div><div class="text-xs text-slate-400">Category</div><div class="font-semibold mt-1">{{ expense.get_category_display }}</div></div>
+        <div><div class="text-xs text-slate-400">Spent by</div><div class="font-semibold mt-1">{{ expense.spent_by.get_full_name|default:expense.spent_by.username }}</div></div>
+        <div><div class="text-xs text-slate-400">Payment mode</div><div class="font-semibold mt-1">{{ expense.get_payment_mode_display }}</div></div>
+        <div><div class="text-xs text-slate-400">Vendor</div><div class="font-semibold mt-1">{{ expense.vendor|default:"—" }}</div></div>
+        <div><div class="text-xs text-slate-400">Advance</div><div class="font-semibold mt-1">{% if expense.advance %}Advance #{{ expense.advance.pk }} · ₹{{ expense.advance.amount|floatformat:2 }}{% else %}Unassigned{% endif %}</div></div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+      <h2 class="font-bold text-lg mb-3">Receipt</h2>
+      {% if expense.receipt %}
+        <a href="{{ expense.receipt.url }}" target="_blank" class="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">Open uploaded receipt ↗</a>
+      {% else %}
+        <div class="rounded-xl border border-dashed p-8 text-center text-slate-400">No receipt uploaded for this expense.</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="space-y-6">
+    <div class="bg-brand-950 text-white rounded-2xl shadow-soft p-6">
+      <div class="text-xs font-bold tracking-widest text-white/50">DIGITAL VOUCHER</div>
+      <div class="text-2xl font-black mt-2">{{ expense.voucher.voucher_no }}</div>
+      <div class="text-sm text-white/60 mt-2">{{ expense.voucher.get_status_display }}</div>
+      <a href="{% url 'voucher_detail' expense.voucher.pk %}" class="mt-5 inline-flex rounded-xl bg-white text-brand-950 px-4 py-2.5 text-sm font-bold">Open voucher</a>
+    </div>
+    {% if expense.approved_by %}
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+      <div class="text-xs text-slate-400">Approved by</div>
+      <div class="font-bold mt-1">{{ expense.approved_by.get_full_name|default:expense.approved_by.username }}</div>
+      <div class="text-xs text-slate-400 mt-1">{{ expense.approved_at|date:"d M Y, h:i A" }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

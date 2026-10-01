@@ -39,6 +39,8 @@ class Advance(models.Model):
 
     def __str__(self):
         return f"Advance #{self.pk} - ₹{self.amount}"
+
+
 class Expense(models.Model):
     STATUS_CHOICES = [
         ('DRAFT', 'Draft'),
@@ -62,6 +64,9 @@ class Expense(models.Model):
         ('BANK', 'Bank Transfer'),
     ]
     project = models.ForeignKey(Project, on_delete=models.PROTECT, related_name='expenses')
+    advance = models.ForeignKey(
+        Advance, on_delete=models.PROTECT, null=True, blank=True, related_name='expenses'
+    )
     spent_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='expenses')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
@@ -77,6 +82,7 @@ class Expense(models.Model):
         User, on_delete=models.PROTECT, null=True, blank=True,
         related_name='approved_expenses'
     )
+
     def __str__(self):
         return f"Expense #{self.pk} - ₹{self.amount}"
 
@@ -115,6 +121,8 @@ class LedgerEntry(models.Model):
     expense = models.ForeignKey(Expense, null=True, blank=True, on_delete=models.SET_NULL)
     advance = models.ForeignKey(Advance, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
 class MonthlyReconciliation(models.Model):
     project = models.ForeignKey(Project, on_delete=models.PROTECT, related_name='reconciliations')
     month = models.DateField(help_text='Use the first day of the month')

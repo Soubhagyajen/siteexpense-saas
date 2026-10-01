@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Advance, Expense, DebitVoucher
+from .models import Project, Advance, Expense
 
 
 class ProjectForm(forms.ModelForm):
@@ -19,13 +19,22 @@ class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
         fields = [
-            'project', 'spent_by', 'category', 'amount', 'date',
+            'project', 'advance', 'spent_by', 'category', 'amount', 'date',
             'description', 'vendor', 'payment_mode', 'receipt',
         ]
-        widgets = {'date': forms.DateInput(attrs={'type': 'date'})}
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.TextInput(attrs={'placeholder': 'What was purchased or paid for?'}),
+            'vendor': forms.TextInput(attrs={'placeholder': 'Vendor / shop name'}),
+        }
 
-
-class VoucherForm(forms.ModelForm):
-    class Meta:
-        model = DebitVoucher
-        fields = ['voucher_no', 'submitted_by', 'status', 'remarks']
+    def clean(self):
+        cleaned = super().clean()
+        project = cleaned.get('project')
+        advance = cleaned.get('advance')
+        amount = cleaned.get('amount')
+        if advance and project and advance.project_id != project.id:
+            self.add_error('advance', 'Select an advance from the same project.')
+        if advance and amount and amount > advance.amount:
+            self.add_error('amount', 'Expense cannot exceed the selected advance amount.')
+        return cleaned

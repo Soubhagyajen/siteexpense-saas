@@ -1,21 +1,29 @@
 {% extends "base.html" %}
 {% block title %}{{ title }} · SiteExpense{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm p-8">
-  <h1 class="text-2xl font-bold mb-6">{{ title }}</h1>
-  <form method="post" class="space-y-5">
-    {% csrf_token %}
-    {% for field in form %}
-      <div>
-        <label class="block text-sm font-medium mb-1">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}<div class="text-red-600 text-sm mt-1">{{ field.errors }}</div>{% endif %}
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6"><div class="text-xs font-bold tracking-widest text-brand-500 uppercase">Site Finance</div><h1 class="text-3xl font-black mt-1">{{ title }}</h1><p class="text-slate-500 mt-2">{% if 'Expense' in title %}Record the actual spend, attach proof and link it to the advance.{% else %}Capture the funds released for a project or site.{% endif %}</p></div>
+  <div class="bg-white rounded-2xl shadow-soft p-6 sm:p-8">
+    <form method="post" {% if multipart %}enctype="multipart/form-data"{% endif %} class="space-y-5">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="rounded-xl bg-rose-50 border border-rose-200 p-3 text-rose-700 text-sm">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div>
+          <label class="block text-sm font-semibold mb-1.5">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="text-xs text-slate-400 mt-1">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div class="text-rose-600 text-sm mt-1">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <div class="flex items-center justify-end gap-3 pt-3">
+        <a href="javascript:history.back()" class="rounded-xl border px-4 py-2.5 text-sm font-semibold">Cancel</a>
+        <button class="rounded-xl bg-brand-950 text-white px-6 py-2.5 text-sm font-semibold hover:bg-brand-900">Save & Continue</button>
       </div>
-    {% endfor %}
-    <button class="rounded-lg bg-slate-950 text-white px-6 py-3">Save</button>
-  </form>
+    </form>
+  </div>
 </div>
 <style>
-input, select, textarea { width:100%; border:1px solid #cbd5e1; border-radius:.5rem; padding:.65rem; }
+input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:.8rem;padding:.72rem .85rem;background:#fff}
+textarea{min-height:110px}input:focus,select:focus,textarea:focus{outline:none;border-color:#ec008c;box-shadow:0 0 0 4px rgba(236,0,140,.08)}
 </style>
 {% endblock %}

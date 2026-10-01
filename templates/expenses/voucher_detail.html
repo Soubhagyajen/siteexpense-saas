@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ voucher.voucher_no }} · SiteExpense{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div><div class="text-xs font-bold tracking-widest text-brand-500">DEBIT VOUCHER</div><h1 class="text-3xl font-black mt-1">{{ voucher.voucher_no }}</h1></div>
+    <button onclick="window.print()" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold">Print</button>
+  </div>
+  <div class="bg-white rounded-2xl shadow-soft overflow-hidden">
+    <div class="p-6 border-b flex flex-col sm:flex-row sm:justify-between gap-4">
+      <div><div class="text-xs text-slate-400">Company</div><div class="font-black text-xl">REP Pvt Ltd</div><div class="text-sm text-slate-500">SiteExpense digital voucher</div></div>
+      <div class="text-left sm:text-right"><div class="text-xs text-slate-400">Status</div><div class="font-bold mt-1">{{ voucher.get_status_display }}</div><div class="text-sm text-slate-500">{{ voucher.created_at|date:"d M Y, h:i A" }}</div></div>
+    </div>
+    <div class="p-6 grid sm:grid-cols-2 gap-5 border-b">
+      <div><div class="text-xs text-slate-400">Project / Site</div><div class="font-semibold mt-1">{{ voucher.expense.project.code }} — {{ voucher.expense.project.name }}</div></div>
+      <div><div class="text-xs text-slate-400">Expense date</div><div class="font-semibold mt-1">{{ voucher.expense.date|date:"d M Y" }}</div></div>
+      <div><div class="text-xs text-slate-400">Spent by</div><div class="font-semibold mt-1">{{ voucher.expense.spent_by.get_full_name|default:voucher.expense.spent_by.username }}</div></div>
+      <div><div class="text-xs text-slate-400">Payment mode</div><div class="font-semibold mt-1">{{ voucher.expense.get_payment_mode_display }}</div></div>
+    </div>
+    <div class="p-6">
+      <table class="w-full text-left"><thead class="bg-slate-50 text-xs uppercase text-slate-400"><tr><th class="p-3">Particulars</th><th class="p-3">Vendor</th><th class="p-3 text-right">Amount</th></tr></thead>
+      <tbody><tr><td class="p-3 font-semibold">{{ voucher.expense.description }}</td><td class="p-3">{{ voucher.expense.vendor|default:"—" }}</td><td class="p-3 text-right font-black">₹{{ voucher.expense.amount|floatformat:2 }}</td></tr></tbody></table>
+    </div>
+    <div class="p-6 bg-slate-50 grid sm:grid-cols-2 gap-6">
+      <div><div class="text-xs text-slate-400">Advance reference</div><div class="font-semibold mt-1">{% if voucher.expense.advance %}Advance #{{ voucher.expense.advance.pk }}{% else %}Not linked{% endif %}</div></div>
+      <div class="sm:text-right"><div class="text-xs text-slate-400">Submitted by</div><div class="font-semibold mt-1">{{ voucher.submitted_by.get_full_name|default:voucher.submitted_by.username }}</div></div>
+    </div>
+    {% if voucher.remarks %}<div class="p-6 border-t"><div class="text-xs text-slate-400">Remarks</div><div class="mt-1">{{ voucher.remarks }}</div></div>{% endif %}
+  </div>
+</div>
+<style>@media print{aside,header,.no-print{display:none!important}main{padding:0!important;max-width:none!important}.shadow-soft{box-shadow:none!important}}</style>
+{% endblock %}

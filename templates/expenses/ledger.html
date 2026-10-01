@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Ledger · SiteExpense{% endblock %}
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
+  <div><div class="text-xs font-bold tracking-widest text-brand-500">ACCOUNTING</div><h1 class="text-3xl font-black mt-1">Ledger</h1><p class="text-slate-500 mt-1">Journal entries created from advances and approved expenses.</p></div>
+</div>
+<div class="bg-white rounded-2xl shadow-soft overflow-hidden">
+  <div class="overflow-x-auto"><table class="w-full min-w-[900px] text-left">
+    <thead class="bg-slate-50 text-xs uppercase text-slate-400"><tr><th class="p-4">Date</th><th>Project</th><th>Account</th><th>Type</th><th>Narration</th><th class="text-right pr-5">Amount</th></tr></thead>
+    <tbody>
+    {% for e in entries %}
+      <tr class="border-b last:border-0 hover:bg-slate-50/60">
+        <td class="p-4 text-sm">{{ e.date|date:"d M Y" }}</td><td class="font-semibold text-sm">{{ e.project.code }}</td><td class="text-sm">{{ e.account }}</td>
+        <td><span class="rounded-full px-2.5 py-1 text-xs font-bold {% if e.entry_type == 'DEBIT' %}bg-rose-50 text-rose-700{% else %}bg-blue-50 text-blue-700{% endif %}">{{ e.entry_type }}</span></td>
+        <td class="text-sm text-slate-600">{{ e.narration }}</td><td class="text-right pr-5 font-bold">₹{{ e.amount|floatformat:2 }}</td>
+      </tr>
+    {% empty %}<tr><td colspan="6" class="p-12 text-center text-slate-400">No ledger entries yet.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}
