@@ -1,1 +1,9 @@
-²ø1šYì
+ï»¿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ec008c"/><stop offset=".55" stop-color="#ff1744"/><stop offset="1" stop-color="#ff9800"/></linearGradient></defs>
+<rect width="420" height="150" rx="24" fill="#09002f"/>
+<g fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+<path d="M105 50 Q150 70 210 42 Q270 70 315 50"/><path d="M105 50 L118 92 L210 92 L302 92 L315 50"/>
+<path d="M175 58 L210 45 L245 58 L210 75 Z"/><path d="M210 42 V126"/>
+<path d="M95 55 C45 68 45 112 105 118 L170 118"/><path d="M325 55 C375 68 375 112 315 118 L250 118"/>
+<path d="M170 118 C145 120 132 132 112 137"/><path d="M250 118 C275 120 288 132 308 137"/>
+</g><text x="210" y="142" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="18" font-weight="800" letter-spacing="4">REP PVT LTD</text></svg>
