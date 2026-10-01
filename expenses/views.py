@@ -29,7 +29,31 @@ def role_required(*roles):
 
 
 def _voucher_no(expense):
-    return f"DV-{timezone.now():%Y%m%d}-{expense.pk:05d}"
+    return f"DV-{expense.date:%Y%m%d}-{expense.pk:05d}"
+
+
+def _ensure_voucher(expense):
+    """Return the expense voucher, creating one for legacy expenses if needed."""
+    try:
+        return expense.voucher
+    except DebitVoucher.DoesNotExist:
+        status_map = {
+            'DRAFT': 'DRAFT',
+            'SUBMITTED': 'PENDING',
+            'APPROVED': 'APPROVED',
+            'REJECTED': 'REJECTED',
+        }
+        voucher = DebitVoucher.objects.create(
+            expense=expense,
+            voucher_no=_voucher_no(expense),
+            submitted_by=expense.spent_by,
+            status=status_map.get(expense.status, 'DRAFT'),
+            approved_by=expense.approved_by if expense.status in ('APPROVED', 'REJECTED') else None,
+            approved_at=expense.approved_at if expense.status in ('APPROVED', 'REJECTED') else None,
+        )
+        return voucher
+
+
 @login_required
 def dashboard(request):
     advances = Advance.objects.aggregate(total=Sum('amount'))['total'] or Decimal('0')
@@ -135,11 +159,13 @@ def expense_create(request):
 @login_required
 def expense_detail(request, pk):
     expense = get_object_or_404(
-        Expense.objects.select_related('project', 'advance', 'spent_by', 'approved_by').prefetch_related('voucher'),
+        Expense.objects.select_related('project', 'advance', 'spent_by', 'approved_by'),
         pk=pk
     )
+    voucher = _ensure_voucher(expense)
     return render(request, 'expenses/expense_detail.html', {
         'expense': expense,
+        'voucher': voucher,
         'role': _role(request.user),
     })
 
@@ -164,7 +190,7 @@ def approve_expense(request, pk):
         expense.approved_by = request.user
         expense.approved_at = timezone.now()
         expense.save(update_fields=['status', 'approved_by', 'approved_at'])
-        voucher = expense.voucher
+        voucher = _ensure_voucher(expense)
         voucher.status = 'APPROVED'
         voucher.approved_by = request.user
         voucher.approved_at = timezone.now()
@@ -190,7 +216,7 @@ def approve_expense(request, pk):
                 advance=expense.advance,
             ),
         ])
-    messages.success(request, f'{expense.voucher.voucher_no} approved and posted to ledger.')
+    messages.success(request, f'{voucher.voucher_no} approved and posted to ledger.')
     return redirect('expense_detail', pk=pk)
 
 
@@ -198,11 +224,11 @@ def approve_expense(request, pk):
 def reject_expense(request, pk):
     if request.method != 'POST':
         return redirect('expense_detail', pk=pk)
-    expense = get_object_or_404(Expense.objects.select_related('voucher'), pk=pk)
+    expense = get_object_or_404(Expense.objects.select_related('spent_by', 'approved_by'), pk=pk)
     if expense.status == 'SUBMITTED':
         expense.status = 'REJECTED'
         expense.save(update_fields=['status'])
-        voucher = expense.voucher
+        voucher = _ensure_voucher(expense)
         voucher.status = 'REJECTED'
         voucher.approved_by = request.user
         voucher.approved_at = timezone.now()

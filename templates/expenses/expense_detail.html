@@ -8,7 +8,7 @@
     <p class="text-slate-500 mt-1">{{ expense.project.code }} · {{ expense.date|date:"d M Y" }}</p>
   </div>
   <div class="flex flex-wrap gap-2">
-    <a href="{% url 'voucher_detail' expense.voucher.pk %}" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">View Debit Voucher</a>
+    {% if voucher %}<a href="{% url 'voucher_detail' voucher.pk %}" class="rounded-xl border bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">View Debit Voucher</a>{% endif %}
     {% if role == 'FOUNDER' and expense.status == 'SUBMITTED' %}
       <form method="post" action="{% url 'approve_expense' expense.pk %}">{% csrf_token %}<button class="rounded-xl bg-emerald-600 text-white px-4 py-2.5 text-sm font-semibold">Approve & Post</button></form>
       <form method="post" action="{% url 'reject_expense' expense.pk %}">{% csrf_token %}<button class="rounded-xl bg-rose-600 text-white px-4 py-2.5 text-sm font-semibold">Reject</button></form>
@@ -43,9 +43,9 @@
   <div class="space-y-6">
     <div class="bg-brand-950 text-white rounded-2xl shadow-soft p-6">
       <div class="text-xs font-bold tracking-widest text-white/50">DIGITAL VOUCHER</div>
-      <div class="text-2xl font-black mt-2">{{ expense.voucher.voucher_no }}</div>
-      <div class="text-sm text-white/60 mt-2">{{ expense.voucher.get_status_display }}</div>
-      <a href="{% url 'voucher_detail' expense.voucher.pk %}" class="mt-5 inline-flex rounded-xl bg-white text-brand-950 px-4 py-2.5 text-sm font-bold">Open voucher</a>
+      {% if voucher %}<div class="text-2xl font-black mt-2">{{ voucher.voucher_no }}</div>
+      <div class="text-sm text-white/60 mt-2">{{ voucher.get_status_display }}</div>
+      <a href="{% url 'voucher_detail' voucher.pk %}" class="mt-5 inline-flex rounded-xl bg-white text-brand-950 px-4 py-2.5 text-sm font-bold">Open voucher</a>{% else %}<div class="text-white/60 mt-3">No voucher is linked to this expense yet.</div>{% endif %}
     </div>
     {% if expense.approved_by %}
     <div class="bg-white rounded-2xl shadow-soft p-6">
