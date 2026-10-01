@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SiteExpense{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+<nav class="bg-slate-950 text-white px-6 py-4">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <a href="{% url 'dashboard' %}" class="font-bold text-xl">SiteExpense</a>
+    {% if user.is_authenticated %}
+    <div class="flex gap-4 text-sm">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'project_list' %}">Projects</a>
+      <a href="{% url 'advance_list' %}">Advances</a>
+      <a href="{% url 'expense_list' %}">Expenses</a>
+      <a href="{% url 'reconciliation' %}">Reconciliation</a>
+      <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}<button>Logout</button></form>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+<main class="max-w-6xl mx-auto p-6">
+  {% for message in messages %}<div class="mb-4 rounded-lg bg-emerald-100 p-3 text-emerald-800">{{ message }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · SiteExpense{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-8">
+  <div><h1 class="text-3xl font-bold">Good day, {{ user.first_name|default:user.username }}</h1>
+  <p class="text-slate-500">Role: {{ role|title }} · Track every rupee spent on site.</p></div>
+  <a href="{% url 'expense_create' %}" class="rounded-lg bg-slate-950 text-white px-5 py-3">+ Record Expense</a>
+</div>
+<div class="grid md:grid-cols-3 gap-4 mb-8">
+  <div class="bg-white rounded-2xl p-5 shadow-sm"><p class="text-slate-500">Total Advances</p><p class="text-3xl font-bold mt-2">₹{{ advance_total|floatformat:2 }}</p></div>
+  <div class="bg-white rounded-2xl p-5 shadow-sm"><p class="text-slate-500">Approved Expenses</p><p class="text-3xl font-bold mt-2">₹{{ approved_total|floatformat:2 }}</p></div>
+  <div class="bg-white rounded-2xl p-5 shadow-sm"><p class="text-slate-500">Pending Expenses</p><p class="text-3xl font-bold mt-2">₹{{ pending_total|floatformat:2 }}</p></div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm p-6">
+  <div class="flex justify-between mb-4"><h2 class="text-xl font-semibold">Recent Expenses</h2><a href="{% url 'expense_list' %}" class="text-sm underline">View all</a></div>
+  <div class="overflow-x-auto"><table class="w-full text-left">
+    <tr class="border-b"><th class="py-3">Date</th><th>Project</th><th>Description</th><th>Amount</th><th>Status</th></tr>
+    {% for e in recent_expenses %}<tr class="border-b"><td class="py-3">{{ e.date }}</td><td>{{ e.project.code }}</td><td>{{ e.description }}</td><td>₹{{ e.amount }}</td><td>{{ e.status }}</td></tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-slate-400">No expenses yet.</td></tr>{% endfor %}
+  </table></div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Reconciliation · SiteExpense{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-2">Monthly Reconciliation</h1>
+<p class="text-slate-500 mb-6">Current MVP calculation across all sites.</p>
+<div class="grid md:grid-cols-3 gap-4">
+  <div class="bg-white rounded-2xl p-6 shadow-sm"><p class="text-slate-500">Advance Received</p><p class="text-3xl font-bold mt-2">₹{{ advances|floatformat:2 }}</p></div>
+  <div class="bg-white rounded-2xl p-6 shadow-sm"><p class="text-slate-500">Approved Expenses</p><p class="text-3xl font-bold mt-2">₹{{ expenses|floatformat:2 }}</p></div>
+  <div class="bg-slate-950 text-white rounded-2xl p-6 shadow-sm"><p class="text-slate-300">Balance Remaining</p><p class="text-3xl font-bold mt-2">₹{{ balance|floatformat:2 }}</p></div>
+</div>
+<div class="mt-8 bg-white rounded-2xl p-6"><h2 class="font-semibold">Core rule</h2><p class="text-slate-600 mt-2">Advance Received − Approved Expenses = Remaining Advance.</p></div>
+{% endblock %}
