@@ -81,7 +81,7 @@ if os.environ.get('DATABASE_URL'):
     # Normalize the malformed `://...` form so deployment can still parse it.
     if database_url.startswith('://'):
         database_url = 'postgresql' + database_url
-    DATABASES = {'default': dj_database_url.config(database_url, conn_max_age=600, ssl_require=True)}
+    DATABASES = {'default': dj_database_url.config(default=database_url, conn_max_age=600, ssl_require=True)}
 else:
     DATABASES = {
         'default': {
