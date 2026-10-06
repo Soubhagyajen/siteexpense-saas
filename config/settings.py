@@ -76,7 +76,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 if os.environ.get('DATABASE_URL'):
     import dj_database_url
-    DATABASES = {'default': dj_database_url.config(conn_max_age=600, ssl_require=True)}
+    database_url = os.environ['DATABASE_URL'].strip().strip('"').strip("'")
+    # Render/Supabase environment values occasionally get pasted without the scheme.
+    # Normalize the malformed `://...` form so deployment can still parse it.
+    if database_url.startswith('://'):
+        database_url = 'postgresql' + database_url
+    DATABASES = {'default': dj_database_url.config(database_url, conn_max_age=600, ssl_require=True)}
 else:
     DATABASES = {
         'default': {
