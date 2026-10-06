@@ -25,8 +25,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-only-change-me')
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,testserver').split(',') if h.strip()]
-CSRF_TRUSTED_ORIGINS = [u.strip() for u in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if u.strip()]
+_allowed_hosts_env = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
+ALLOWED_HOSTS = list(dict.fromkeys(['127.0.0.1', 'localhost', 'testserver', 'siteexpense-saas.onrender.com'] + _allowed_hosts_env))
+
+_csrf_origins_env = [u.strip() for u in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if u.strip()]
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(['https://siteexpense-saas.onrender.com'] + _csrf_origins_env))
 
 
 # Application definition
